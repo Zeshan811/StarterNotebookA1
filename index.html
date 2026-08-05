@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Archetypes: Clustering the Search Portfolio — FlyRank ML Internship Capstone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F6F1;
+    --paper-alt:#EDEFE7;
+    --ink:#1A1D1B;
+    --ink-soft:#4A504B;
+    --teal:#12645C;
+    --teal-deep:#0B3F3A;
+    --amber:#D98E3B;
+    --line:#C9D2C6;
+    --card:#FFFFFF;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation:none !important; transition:none !important;}
+  }
+  a{color:var(--teal-deep);}
+  .wrap{max-width:840px; margin:0 auto; padding:0 24px;}
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background:var(--teal);
+    display:inline-block;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:120px 0 90px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-120px; top:-80px;
+    width:420px; height:420px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(18,100,92,0.10), transparent 70%);
+  }
+  h1.title{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(2.1rem, 5vw, 3.4rem);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:0 0 22px;
+    max-width:11ch;
+  }
+  h1.title em{ font-style:italic; color:var(--teal-deep); font-weight:500;}
+  .subtitle{
+    font-size:1.08rem;
+    color:var(--ink-soft);
+    max-width:56ch;
+    margin:0 0 34px;
+  }
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:26px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:20px;
+  }
+  .meta-row span b{ color:var(--ink); font-weight:600; display:block; font-family:var(--sans); font-size:13.5px; margin-top:2px;}
+
+  /* ---------- SECTIONS ---------- */
+  section{ padding:74px 0; }
+  section.alt{ background:var(--paper-alt); }
+  h2.sec-title{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(1.5rem, 3vw, 2rem);
+    margin:0 0 26px;
+    letter-spacing:-0.005em;
+  }
+  p{ margin:0 0 18px; color:var(--ink); }
+  p.lede{ font-size:1.06rem; color:var(--ink-soft); }
+  .callout{
+    border-left:3px solid var(--amber);
+    background:rgba(217,142,59,0.07);
+    padding:16px 20px;
+    font-size:0.96rem;
+    color:var(--ink-soft);
+    margin:24px 0;
+  }
+  .callout b{ color:var(--ink); }
+
+  /* stat strip */
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin:30px 0;
+  }
+  .stat{
+    background:var(--card);
+    padding:22px 18px;
+  }
+  .stat .num{
+    font-family:var(--mono);
+    font-size:1.5rem;
+    font-weight:600;
+    color:var(--teal-deep);
+    display:block;
+  }
+  .stat .label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  /* table */
+  table.data{
+    width:100%;
+    border-collapse:collapse;
+    margin:24px 0;
+    font-size:0.92rem;
+  }
+  table.data th, table.data td{
+    text-align:left;
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  table.data th{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  table.data td.num, table.data th.num{ font-family:var(--mono); }
+
+  /* ---------- SPECIMEN CARDS (signature element) ---------- */
+  .specimen-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
+    gap:16px;
+    margin-top:30px;
+  }
+  .specimen{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:22px 20px 20px;
+    position:relative;
+  }
+  .specimen .id{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--teal);
+    letter-spacing:0.06em;
+  }
+  .specimen h3{
+    font-family:var(--serif);
+    font-size:1.18rem;
+    margin:6px 0 10px;
+    font-weight:600;
+  }
+  .specimen .quad{
+    width:100%;
+    height:70px;
+    margin:10px 0 14px;
+  }
+  .specimen dl{ margin:0; font-size:12.5px; color:var(--ink-soft);}
+  .specimen dl div{ display:flex; justify-content:space-between; padding:3px 0; border-top:1px dashed var(--line); }
+  .specimen dl div:first-child{ border-top:none; }
+  .specimen dl b{ font-family:var(--mono); color:var(--ink); font-weight:600; }
+  .specimen .action{
+    margin-top:14px;
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--teal-deep);
+    background:rgba(18,100,92,0.09);
+    padding:5px 10px;
+  }
+  .specimen.outlier{ border-color:var(--amber); }
+  .specimen.outlier .id{ color:var(--amber); }
+  .specimen.outlier .action{ color:#8a5a1c; background:rgba(217,142,59,0.14); }
+
+  /* limitations list */
+  ul.limits{ list-style:none; padding:0; margin:24px 0;}
+  ul.limits li{
+    padding:14px 0 14px 26px;
+    border-top:1px solid var(--line);
+    position:relative;
+    font-size:0.96rem;
+    color:var(--ink-soft);
+  }
+  ul.limits li::before{
+    content:"–";
+    position:absolute; left:0; top:14px;
+    color:var(--amber);
+    font-weight:700;
+  }
+  ul.limits li b{ color:var(--ink); }
+
+  /* recommendations */
+  .rec-list{ margin:24px 0; }
+  .rec{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:16px;
+    padding:16px 0;
+    border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .rec .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--teal-deep);
+    background:rgba(18,100,92,0.09);
+    padding:4px 8px;
+    text-align:center;
+    height:fit-content;
+  }
+  .rec p{ margin:0; font-size:0.95rem; }
+  .rec .arch{ font-weight:600; }
+
+  /* repro / footer */
+  .repro-box{
+    border:1px solid var(--line);
+    background:var(--card);
+    padding:26px 24px;
+    margin-top:20px;
+  }
+  .repro-box a.file-link{
+    display:block;
+    font-family:var(--mono);
+    font-size:13px;
+    padding:9px 0;
+    border-top:1px dashed var(--line);
+    text-decoration:none;
+  }
+  .repro-box a.file-link:first-of-type{ border-top:none; }
+  .repro-box a.file-link::before{ content:"→ "; color:var(--teal); }
+
+  footer{
+    padding:50px 0 70px;
+    text-align:center;
+    font-size:13px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+  }
+  footer a{ color:var(--teal-deep); font-weight:600; }
+
+  .fill{ color:#B0401D; font-weight:600; background:rgba(176,64,29,0.08); padding:0 4px;}
+
+  /* fade-in on scroll */
+  .reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">FlyRank ML Internship — Capstone Paper</div>
+    <h1 class="title">Content <em>Archetypes</em>: Clustering a Search Portfolio into Actionable Groups</h1>
+    <p class="subtitle">
+      What natural performance archetypes exist across a large content inventory —
+      and can they be discovered directly from search behavior, without hand-written rules?
+    </p>
+    <div class="meta-row">
+      <span>Lane<b>Structured Content Archetype Clustering</b></span>
+      <span>Method<b>K-Means, standardized features</b></span>
+      <span>Data window<b>March 2026 (mid-panel)</b></span>
+      <span>Status<b>Final</b></span>
+    </div>
+  </div>
+</header>
+
+<!-- ABSTRACT -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">Abstract</div>
+    <h2 class="sec-title">Five sentences, no theory</h2>
+    <p class="lede">
+      This project asks whether a large content inventory can be grouped into meaningful
+      performance archetypes using only observed search signals, rather than hand-written
+      rules. Using a March 2026 slice of FlyRank's search warehouse (331,437 content items
+      across 55 clients), four leakage-checked features — impressions, clicks, average
+      position, and click-through rate — were standardized and clustered with K-Means.
+      The resulting six clusters separate cleanly along visibility and position, surfacing
+      groups such as <b>champions</b>, <b>buried pages</b>, and <b>hidden gems</b> that a
+      single-threshold rule could not distinguish. A held-out, client-grouped validation
+      check confirms
+      that this structure holds beyond the exact rows it was fit on. The result is offered
+      as a decision-support triage lens for content review — not a causal claim about what
+      makes any single page succeed.
+    </p>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="alt">
+  <div class="wrap reveal">
+    <div class="eyebrow">01 — Introduction</div>
+    <h2 class="sec-title">The decision this supports</h2>
+    <p>
+      A content team managing tens of thousands of pages cannot review each one
+      individually. The practical question is not "what predicts a page's decline?" but
+      simpler and more immediate: <b>which group of pages should a reviewer look at first,
+      and what should they do with each group?</b>
+    </p>
+    <p>
+      A fixed rule — like a single CTR or freshness threshold — can only check one or two
+      conditions at a time. Real archetypes are defined by the interaction of several
+      signals at once: a page can have high traffic and low engagement, or low traffic and
+      surprisingly strong engagement, and a single-threshold rule collapses these into the
+      same bucket. Clustering was chosen specifically because it can separate pages by the
+      combination of signals, not just one axis — while remaining fully interpretable
+      through cluster-level averages.
+    </p>
+    <div class="callout">
+      <b>What this is not:</b> this is not a claim about why any individual page ranks the
+      way it does, and it does not reproduce or reveal anything about Google's ranking
+      algorithm. It is a triage lens built from observed, pseudonymized search behavior.
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">02 — Data</div>
+    <h2 class="sec-title">What went in, and what was deliberately left out</h2>
+    <p>
+      All analysis runs on the FlyRank ML Internship warehouse release
+      (build <code>flyrank_pseudonymized_warehouse_release_v20260703</code>), read directly
+      from its hosted Parquet files — no raw client names, domains, URLs, or queries are
+      present anywhere in this pipeline or its outputs.
+    </p>
+    <div class="stat-strip">
+      <div class="stat"><span class="num">9.84M</span><span class="label">rows in the March 2026 slice</span></div>
+      <div class="stat"><span class="num">331,437</span><span class="label">unique content items</span></div>
+      <div class="stat"><span class="num">55</span><span class="label">clients represented</span></div>
+      <div class="stat"><span class="num">4.2%</span><span class="label">rows with GA4 data available</span></div>
+    </div>
+    <p>
+      The grain is <b>one row = one content item, for one client, on one day</b>, confirmed
+      by query (total rows exactly equal distinct client × content × date combinations —
+      no duplication). March 2026 was used as the development window on purpose: the
+      warehouse's final month is held out as a sealed test period and was never used to
+      shape any feature or label logic here.
+    </p>
+    <p>
+      Because only 4.2% of rows carry GA4 (engagement/session) data, engagement-based
+      features were excluded from the final model — using them would have meant treating
+      "no data" as "no engagement" for 95.8% of rows, which is not a safe assumption. The
+      four features used are all Search Console signals, available for effectively every
+      row in the slice: total impressions, total clicks, average position, and click-through
+      rate.
+    </p>
+    <p>
+      FlyRank's own product decision outputs — <code>health_score</code>,
+      <code>priority_score</code>, <code>action_type</code>, and any refresh/review flags —
+      are excluded entirely. They are not observable signals; they are the product's own
+      conclusions, and including them would let clustering simply reproduce an existing
+      rule instead of discovering structure from raw evidence.
+    </p>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="alt">
+  <div class="wrap reveal">
+    <div class="eyebrow">03 — Methodology</div>
+    <h2 class="sec-title">Baseline, model, and how each was checked</h2>
+    <p>
+      <b>Baseline (Week 4).</b> Before any modeling, two signals were checked directly
+      against the data rather than assumed. CTR-vs-position confirmed cleanly: click-through
+      rate drops as position tier worsens, across a large <code>n</code> in every bucket —
+      matching the logic behind FlyRank's own CTR-fix flag. A simple rule was then encoded:
+      flag pages with enough volume to matter, a fixable position (not top-3, not past
+      position 20), and a CTR below their own position tier's average. This produced a
+      ranked queue of 52,839 candidate pages with one reason code and one action label.
+    </p>
+    <p>
+      <b>Model (Week 5).</b> K-Means was chosen because the underlying question —
+      "what natural groups exist?" — has no label to predict; it is an unsupervised
+      question by construction. Features were standardized before clustering so that
+      large-scale features like impressions could not silently dominate the distance
+      calculation. <span class="fill">k = 6</span> was selected by comparing silhouette
+      scores across candidate values on a training split.
+    </p>
+    <p>
+      <b>Validation (Week 6).</b> The single biggest methodological risk for this data is
+      that content items from the same client can share structural similarities — so a
+      plain random split risks letting the model "see" a client's pattern in both train and
+      test. The model was re-run under a <b>client-grouped split</b> (whole clients held out,
+      never divided across train/test) and compared before vs. after:
+    </p>
+    <table class="data">
+      <tr><th>Split design</th><th class="num">Train silhouette</th><th class="num">Test silhouette</th></tr>
+      <tr><td>Random split (Week 5, original)</td><td class="num">0.487</td><td class="num">0.480</td></tr>
+      <tr><td>Client-grouped split (honest)</td><td class="num">0.475</td><td class="num">0.490</td></tr>
+    </table>
+    <p>
+      The grouped split's test silhouette (0.490) sits close to — and slightly above —
+      the random split's test silhouette (0.480). This is a reassuring, honest result:
+      the random split was not overly optimistic, and the cluster structure holds up
+      even when whole clients are held out of training. The archetypes appear to reflect
+      real content-level behavior rather than a client-specific artifact.
+    </p>
+    <p>
+      A leakage audit was repeated on the final feature set: no feature is calculated from
+      outside the March 2026 window, no FlyRank product flag was reintroduced, and no
+      derived field secretly encodes information from a later period.
+    </p>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">04 — Results</div>
+    <h2 class="sec-title">Six archetypes, catalogued</h2>
+    <p class="lede">
+      Each specimen below is one cluster, described by its average feature values —
+      not by a name chosen in advance.
+    </p>
+
+    <div class="specimen-grid">
+      <div class="specimen">
+        <div class="id">SPC—00</div>
+        <h3>Mid-Tier Visible</h3>
+        <svg class="quad" viewBox="0 0 200 70"><rect x="0" y="0" width="200" height="70" fill="none"/><circle cx="120" cy="30" r="8" fill="#12645C" opacity="0.75"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>25,349</b></div>
+          <div><span>Clicks</span><b>75</b></div>
+          <div><span>Position</span><b>10.0</b></div>
+          <div><span>CTR</span><b>0.004</b></div>
+          <div><span>n</span><b>3,413</b></div>
+        </dl>
+        <span class="action">monitor</span>
+      </div>
+
+      <div class="specimen">
+        <div class="id">SPC—01</div>
+        <h3>Background / Low-Signal</h3>
+        <svg class="quad" viewBox="0 0 200 70"><circle cx="60" cy="45" r="8" fill="#12645C" opacity="0.6"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>1,921</b></div>
+          <div><span>Clicks</span><b>4</b></div>
+          <div><span>Position</span><b>9.3</b></div>
+          <div><span>CTR</span><b>0.002</b></div>
+          <div><span>n</span><b>70,853</b></div>
+        </dl>
+        <span class="action">low priority</span>
+      </div>
+
+      <div class="specimen">
+        <div class="id">SPC—02</div>
+        <h3>Buried Pages</h3>
+        <svg class="quad" viewBox="0 0 200 70"><circle cx="30" cy="55" r="8" fill="#12645C" opacity="0.6"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>1,581</b></div>
+          <div><span>Clicks</span><b>1.4</b></div>
+          <div><span>Position</span><b>40.4</b></div>
+          <div><span>CTR</span><b>0.001</b></div>
+          <div><span>n</span><b>17,031</b></div>
+        </dl>
+        <span class="action">visibility work, not a CTR fix</span>
+      </div>
+
+      <div class="specimen">
+        <div class="id">SPC—03</div>
+        <h3>Hidden Gems</h3>
+        <svg class="quad" viewBox="0 0 200 70"><circle cx="90" cy="12" r="8" fill="#D98E3B" opacity="0.85"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>1,590</b></div>
+          <div><span>Clicks</span><b>16.5</b></div>
+          <div><span>Position</span><b>8.6</b></div>
+          <div><span>CTR</span><b>0.012</b></div>
+          <div><span>n</span><b>9,999</b></div>
+        </dl>
+        <span class="action">promote / expand</span>
+      </div>
+
+      <div class="specimen">
+        <div class="id">SPC—04</div>
+        <h3>Champions</h3>
+        <svg class="quad" viewBox="0 0 200 70"><circle cx="160" cy="14" r="10" fill="#12645C"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>88,174</b></div>
+          <div><span>Clicks</span><b>500</b></div>
+          <div><span>Position</span><b>5.8</b></div>
+          <div><span>CTR</span><b>0.008</b></div>
+          <div><span>n</span><b>144</b></div>
+        </dl>
+        <span class="action">protect, don't disturb</span>
+      </div>
+
+      <div class="specimen outlier">
+        <div class="id">SPC—05 · OUTLIER</div>
+        <h3>Extreme Single Page</h3>
+        <svg class="quad" viewBox="0 0 200 70"><circle cx="185" cy="8" r="12" fill="#D98E3B"/></svg>
+        <dl>
+          <div><span>Impressions</span><b>617,124</b></div>
+          <div><span>Clicks</span><b>5,668</b></div>
+          <div><span>Position</span><b>2.4</b></div>
+          <div><span>CTR</span><b>0.009</b></div>
+          <div><span>n</span><b>1</b></div>
+        </dl>
+        <span class="action">exclude — not a real archetype</span>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:28px;">
+      <b>Honest read on SPC—05:</b> one page's traffic is roughly 7–10× the next largest
+      in the dataset. K-Means gave it its own cluster because it is mathematically distant
+      from everything else — not because a one-page group is a meaningful archetype. A
+      production version should cap or log-transform impressions, or separate extreme
+      outliers before clustering, so a single page cannot distort the boundaries drawn for
+      everyone else.
+    </div>
+  </div>
+</section>
+
+<!-- LIMITATIONS -->
+<section class="alt">
+  <div class="wrap reveal">
+    <div class="eyebrow">05 — Limitations &amp; honest framing</div>
+    <h2 class="sec-title">What this can and cannot say</h2>
+    <ul class="limits">
+      <li><b>Observational, not causal.</b> These clusters describe association between
+      search signals, observed in one month. They do not show that moving a page between
+      archetypes would cause a change in its performance.</li>
+      <li><b>One month is a snapshot.</b> March 2026 alone cannot separate a real, lasting
+      pattern from ordinary month-to-month noise or seasonality.</li>
+      <li><b>Unbalanced client history.</b> Clients have very different amounts of tracked
+      history; only a small subset have 12+ months of data, limiting any seasonal reading.</li>
+      <li><b>Outlier sensitivity.</b> As shown above, K-Means is sensitive to extreme values;
+      one page produced its own single-item cluster.</li>
+      <li><b>Metric clustering, not semantic clustering.</b> Archetypes are grouped by
+      numeric behavior, not by article meaning or topic — no text fields were available or
+      used, and none of this should be read as content-meaning analysis.</li>
+      <li><b>Lost daily detail.</b> Aggregating to one row per content item per month
+      collapses day-to-day volatility — two pages with identical monthly totals but very
+      different daily patterns look identical to this model.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">06 — Ranked recommendations</div>
+    <h2 class="sec-title">An action playbook, by archetype</h2>
+    <div class="rec-list">
+      <div class="rec"><span class="tag">1st</span><p><span class="arch">Champions (SPC—04)</span> — protect. High traffic, strong position, solid CTR. Avoid disruptive changes; monitor for early signs of decline only.</p></div>
+      <div class="rec"><span class="tag">2nd</span><p><span class="arch">Hidden Gems (SPC—03)</span> — promote / expand. Best CTR of any real cluster despite modest traffic; a proven format worth wider distribution or internal linking.</p></div>
+      <div class="rec"><span class="tag">3rd</span><p><span class="arch">Buried Pages (SPC—02)</span> — visibility work, not a metadata fix. Average position past 40 means the constraint is ranking, not the title or snippet.</p></div>
+      <div class="rec"><span class="tag">4th</span><p><span class="arch">Mid-Tier Visible (SPC—00)</span> — monitor on a normal cadence; steady performers, no urgent action implied by this data alone.</p></div>
+      <div class="rec"><span class="tag">5th</span><p><span class="arch">Background / Low-Signal (SPC—01)</span> — lowest priority for manual review; the largest group by count, best handled with lightweight, rule-based monitoring rather than individual attention.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- REPRODUCIBILITY -->
+<section class="alt">
+  <div class="wrap reveal">
+    <div class="eyebrow">07 — Reproducibility</div>
+    <h2 class="sec-title">Every step, in order</h2>
+    <p>All notebooks referenced below live in <code>work/notebooks/</code> of the linked repository and can be re-run top to bottom against the same Hugging Face warehouse release.</p>
+    <div class="repro-box">
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w01_research_question.ipynb">work/notebooks/w01_research_question.ipynb — lane choice and framing</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w02_ml_task_framing.ipynb">work/notebooks/w02_ml_task_framing.ipynb — task type, target, metric</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w03_data_contract.ipynb">work/notebooks/w03_data_contract.ipynb — grain, verification queries, leakage demo</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w04_baseline_score.ipynb">work/notebooks/w04_baseline_score.ipynb — signal checks, baseline rule, top-20 review</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w05_model.ipynb">work/notebooks/w05_model.ipynb — K-Means, split design, cluster profiles</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1/blob/main/work/notebooks/w06_validation_audit.ipynb">work/notebooks/w06_validation_audit.ipynb — grouped split, leakage audit, claim rewrite</a>
+      <a class="file-link" href="https://github.com/Zeshan811/StarterNotebookA1">github.com/Zeshan811/StarterNotebookA1</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Built on the FlyRank ML Internship dataset — <a href="https://flyrank.ai" target="_blank" rel="noopener">flyrank.ai</a></p>
+    <p style="margin-top:6px; font-family:var(--mono); font-size:11.5px;">Observed / directional / decision-support claims only. No client names, domains, or raw queries appear anywhere above.</p>
+  </div>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.12});
+  els.forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
